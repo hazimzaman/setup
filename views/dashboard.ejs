@@ -1,0 +1,304 @@
+<%- include('partials/header', { title: 'Dashboard — Setup Portal', active: 'dashboard' }) %>
+
+<header class="page-header">
+    <div>
+        <h1>Dashboard <span class="emoji-accent">⚡</span></h1>
+        <p class="page-subtitle"><%= user.username %> · WordPress deployment overview</p>
+    </div>
+    <div class="header-actions">
+        <a href="/deploy" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New site
+        </a>
+    </div>
+</header>
+
+<!-- Stat cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-orange">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+        </div>
+        <div class="stat-num stat-num-orange" id="stat-total">—</div>
+        <div class="stat-label">Total Sites</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-green">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+        <div class="stat-num stat-num-green" id="stat-active">—</div>
+        <div class="stat-label">Active Sites</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+        </div>
+        <div class="stat-num stat-num-blue" id="stat-recent">—</div>
+        <div class="stat-label">Last 7 Days</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon stat-icon-purple">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+        </div>
+        <div class="stat-num stat-num-purple" id="stat-month">—</div>
+        <div class="stat-label">This Month</div>
+    </div>
+</div>
+
+<!-- Charts row -->
+<div class="charts-grid">
+    <div class="chart-card">
+        <div class="chart-header">
+            <div class="chart-title">
+                <span class="chart-icon-bg chart-icon-orange">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </span>
+                <h3>Deploy Trend</h3>
+            </div>
+            <span class="chart-meta">Last 30 days</span>
+        </div>
+        <div class="chart-body">
+            <canvas id="trend-chart" width="600" height="240"></canvas>
+            <div id="trend-empty" class="chart-empty" style="display:none;">No deploys yet — start by adding a new site.</div>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-header">
+            <div class="chart-title">
+                <span class="chart-icon-bg chart-icon-blue">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                        <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                    </svg>
+                </span>
+                <h3>Site Status</h3>
+            </div>
+        </div>
+        <div class="chart-body">
+            <div id="status-breakdown" class="status-breakdown">
+                <div class="status-row" data-status="healthy">
+                    <span class="status-dot" style="background:#10b981"></span>
+                    <span class="status-name">Healthy</span>
+                    <span class="status-bar"><span class="status-bar-fill" data-color="#10b981"></span></span>
+                    <span class="status-count">—</span>
+                </div>
+                <div class="status-row" data-status="unhealthy">
+                    <span class="status-dot" style="background:#f59e0b"></span>
+                    <span class="status-name">Unhealthy</span>
+                    <span class="status-bar"><span class="status-bar-fill" data-color="#f59e0b"></span></span>
+                    <span class="status-count">—</span>
+                </div>
+                <div class="status-row" data-status="exited">
+                    <span class="status-dot" style="background:#ef4444"></span>
+                    <span class="status-name">Exited</span>
+                    <span class="status-bar"><span class="status-bar-fill" data-color="#ef4444"></span></span>
+                    <span class="status-count">—</span>
+                </div>
+                <div class="status-row" data-status="other">
+                    <span class="status-dot" style="background:#94a3b8"></span>
+                    <span class="status-name">Other</span>
+                    <span class="status-bar"><span class="status-bar-fill" data-color="#94a3b8"></span></span>
+                    <span class="status-count">—</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent sites -->
+<div class="card">
+    <div class="card-head">
+        <h3>Recent sites</h3>
+        <a href="/sites" class="link-arrow">View all
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
+    </div>
+    <div id="recent-sites" class="recent-sites">
+        <div class="empty-row">Loading…</div>
+    </div>
+</div>
+
+<script>
+// Fetch + populate dashboard
+(async function() {
+    try {
+        const r = await fetch('/api/dashboard-data');
+        if (!r.ok) throw new Error('Failed to load');
+        const data = await r.json();
+
+        document.getElementById('stat-total').textContent = data.total;
+        document.getElementById('stat-active').textContent = data.active;
+        document.getElementById('stat-recent').textContent = data.last7;
+        document.getElementById('stat-month').textContent = data.thisMonth;
+
+        renderTrend(data.trend);
+        renderStatus(data.statusBreakdown, data.total);
+        renderRecent(data.recent);
+    } catch (err) {
+        console.error(err);
+        document.getElementById('recent-sites').innerHTML = '<div class="empty-row error-row">Could not load dashboard data: ' + err.message + '</div>';
+    }
+})();
+
+function renderTrend(trend) {
+    const canvas = document.getElementById('trend-chart');
+    const empty = document.getElementById('trend-empty');
+    if (!trend || trend.length === 0 || trend.every(v => v.count === 0)) {
+        canvas.style.display = 'none';
+        empty.style.display = 'flex';
+        return;
+    }
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const padding = { top: 20, right: 20, bottom: 30, left: 40 };
+    const chartW = W - padding.left - padding.right;
+    const chartH = H - padding.top - padding.bottom;
+
+    const max = Math.max(1, ...trend.map(t => t.count));
+
+    // Grid lines
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartH / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(W - padding.right, y);
+        ctx.stroke();
+    }
+
+    // Axis labels
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '11px "Plus Jakarta Sans", sans-serif';
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartH / 4) * (4 - i);
+        const val = Math.round((max / 4) * i);
+        ctx.fillText(val.toString(), padding.left - 8, y + 4);
+    }
+
+    // Compute points
+    const points = trend.map((t, i) => ({
+        x: padding.left + (chartW * i) / (trend.length - 1 || 1),
+        y: padding.top + chartH - (t.count / max) * chartH,
+        label: t.label,
+        count: t.count
+    }));
+
+    // Area fill
+    const grad = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+    grad.addColorStop(0, 'rgba(249, 115, 22, 0.25)');
+    grad.addColorStop(1, 'rgba(249, 115, 22, 0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, padding.top + chartH);
+    points.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(points[points.length - 1].x, padding.top + chartH);
+    ctx.closePath();
+    ctx.fill();
+
+    // Smooth curve
+    ctx.strokeStyle = '#f97316';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+        const prev = points[i - 1];
+        const curr = points[i];
+        const cpx = (prev.x + curr.x) / 2;
+        ctx.bezierCurveTo(cpx, prev.y, cpx, curr.y, curr.x, curr.y);
+    }
+    ctx.stroke();
+
+    // Dots on points where count > 0
+    ctx.fillStyle = '#f97316';
+    points.forEach(p => {
+        if (p.count > 0) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    });
+
+    // X-axis: only show first/middle/last labels
+    ctx.fillStyle = '#9ca3af';
+    ctx.textAlign = 'center';
+    [0, Math.floor(points.length / 2), points.length - 1].forEach(i => {
+        if (points[i]) {
+            ctx.fillText(points[i].label, points[i].x, H - padding.bottom + 18);
+        }
+    });
+}
+
+function renderStatus(breakdown, total) {
+    const rows = document.querySelectorAll('.status-row');
+    rows.forEach(row => {
+        const key = row.dataset.status;
+        const count = (breakdown && breakdown[key]) || 0;
+        const pct = total ? (count / total) * 100 : 0;
+        row.querySelector('.status-count').textContent = count;
+        const fill = row.querySelector('.status-bar-fill');
+        fill.style.width = pct + '%';
+        fill.style.background = fill.dataset.color;
+    });
+}
+
+function renderRecent(sites) {
+    const container = document.getElementById('recent-sites');
+    if (!sites || sites.length === 0) {
+        container.innerHTML = '<div class="empty-row">No sites yet. <a href="/deploy">Deploy your first one →</a></div>';
+        return;
+    }
+    container.innerHTML = sites.slice(0, 5).map(s => `
+        <div class="recent-row">
+            <div class="recent-main">
+                <span class="recent-status status-${escapeHtml(s.statusKind || 'other')}"></span>
+                <div>
+                    <div class="recent-name">${escapeHtml(s.name)}</div>
+                    <a href="${escapeHtml(s.url || '#')}" target="_blank" class="recent-url">${escapeHtml(s.url || '')}</a>
+                </div>
+            </div>
+            <span class="recent-meta">${escapeHtml(s.statusLabel)}</span>
+        </div>
+    `).join('');
+}
+
+function escapeHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,87 @@
+<%- include('partials/header', { title: 'Sites — Setup Portal', active: 'sites' }) %>
+
+<header class="page-header">
+    <div>
+        <h1>Sites <span class="emoji-accent">📋</span></h1>
+        <p class="page-subtitle"><%= sites.length %> WordPress site<%= sites.length === 1 ? '' : 's' %> deployed via this portal</p>
+    </div>
+    <div class="header-actions">
+        <a href="/deploy" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New site
+        </a>
+    </div>
+</header>
+
+<% if (fetchError) { %>
+    <div class="alert alert-error">
+        Could not fetch sites from Coolify: <%= fetchError %>
+    </div>
+<% } %>
+
+<% if (sites.length === 0 && !fetchError) { %>
+    <div class="card empty-card">
+        <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+        </div>
+        <h3>No sites yet</h3>
+        <p>Deploy your first WordPress site in about 90 seconds.</p>
+        <a href="/deploy" class="btn btn-primary" style="margin-top:1rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Deploy first site
+        </a>
+    </div>
+<% } else { %>
+    <div class="sites-table">
+        <% sites.forEach(function(site) { 
+            var statusKind = 'other';
+            var statusLabel = site.status || 'unknown';
+            var status = (site.status || '').toLowerCase();
+            if (status.indexOf('healthy') !== -1 && status.indexOf('unhealthy') === -1) {
+                statusKind = 'healthy'; statusLabel = 'Healthy';
+            } else if (status.indexOf('unhealthy') !== -1) {
+                statusKind = 'unhealthy'; statusLabel = 'Unhealthy';
+            } else if (status.indexOf('exited') !== -1 || status.indexOf('stopped') !== -1) {
+                statusKind = 'exited'; statusLabel = 'Stopped';
+            } else if (status.indexOf('running') !== -1) {
+                statusKind = 'running'; statusLabel = 'Running';
+            }
+        %>
+            <div class="site-card">
+                <div class="site-card-main">
+                    <span class="site-status site-status-<%= statusKind %>"></span>
+                    <div class="site-info">
+                        <h4><%= site.name.replace(/^wp-/, '') %></h4>
+                        <% if (site.url) { %>
+                            <a href="<%= site.url %>" target="_blank" class="site-url">
+                                <%= site.url.replace(/^https?:\/\//, '') %>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="site-card-meta">
+                    <span class="badge badge-<%= statusKind %>"><%= statusLabel %></span>
+                    <% if (site.url) { %>
+                        <a href="<%= site.url %>/wp-admin" target="_blank" class="btn btn-ghost btn-sm">Admin</a>
+                    <% } %>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+<% } %>
+
+<%- include('partials/footer') %>
