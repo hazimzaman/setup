@@ -1,0 +1,13 @@
+node_modules
+.env
+.env.local
+.env.*.local
+.git
+.gitignore
+.vscode
+.idea
+*.log
+.DS_Store
+README.md
+test-templates.js
+hash-password.js
